@@ -13,6 +13,6 @@ public class PostResponse {
     private int viewCnt;
     private Boolean noticeYn;
     private Boolean deleteYn;
-    private LocalDateTime createDate;
+    private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 }
