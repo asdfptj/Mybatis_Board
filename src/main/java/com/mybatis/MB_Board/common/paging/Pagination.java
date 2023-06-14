@@ -1,6 +1,7 @@
 package com.mybatis.MB_Board.common.paging;
 
 import com.mybatis.MB_Board.common.dto.SearchDto;
+import com.mybatis.MB_Board.domain.comment.CommentSearchDto;
 import lombok.Getter;
 
 @Getter
@@ -18,8 +19,10 @@ public class Pagination {
         if (totalRecordCount > 0) {
             this.totalRecordCount = totalRecordCount;
             calculation(params);
+            params.setPagination(this);
         }
     }
+
 
     private void calculation(SearchDto params) {
 

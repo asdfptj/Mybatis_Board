@@ -3,6 +3,9 @@ package com.mybatis.MB_Board.domain.post;
 import com.mybatis.MB_Board.common.dto.MessageDto;
 import com.mybatis.MB_Board.common.dto.SearchDto;
 import com.mybatis.MB_Board.common.paging.PagingResponse;
+import com.mybatis.MB_Board.domain.file.FileRequest;
+import com.mybatis.MB_Board.domain.file.FileService;
+import com.mybatis.MB_Board.domain.file.FileUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +19,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
+    private final FileService fileService;
+    private final FileUtils fileUtils;
 
     // 게시글 작성 페이지
     @GetMapping("/post/write.do")
@@ -28,9 +33,15 @@ public class PostController {
     }
 
     // 신규 게시글 생성
+
+
+    // 신규 게시글 생성
+
     @PostMapping("/post/save.do")
     public String savePost(final PostRequest params, Model model) {
-        postService.savePost(params);
+        Long id = postService.savePost(params);
+        List<FileRequest> files = fileUtils.uploadFiles(params.getFiles());
+        fileService.saveFiles(id, files);
         MessageDto message = new MessageDto("게시글 생성이 완료되었습니다.", "/post/list.do", RequestMethod.GET, null);
         return showMessageAndRedirect(message, model);
     }
