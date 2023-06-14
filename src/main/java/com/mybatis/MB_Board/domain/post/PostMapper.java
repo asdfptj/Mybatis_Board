@@ -1,4 +1,5 @@
 package com.mybatis.MB_Board.domain.post;
+import com.mybatis.MB_Board.common.dto.SearchDto;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -35,12 +36,12 @@ public interface PostMapper {
      * 게시글 리스트 조회
      * @return 게시글 리스트
      */
-    List<PostResponse> findAll();
+    List<PostResponse> findAll(SearchDto params);
 
     /**
      * 게시글 수 카운팅
      * @return 게시글 수
      */
-    int count();
+    int count(SearchDto params);
 
 }

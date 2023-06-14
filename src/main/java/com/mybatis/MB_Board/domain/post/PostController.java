@@ -1,13 +1,16 @@
 package com.mybatis.MB_Board.domain.post;
 
+import com.mybatis.MB_Board.common.dto.MessageDto;
+import com.mybatis.MB_Board.common.dto.SearchDto;
+import com.mybatis.MB_Board.common.paging.PagingResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -24,17 +27,20 @@ public class PostController {
         return "post/write";
     }
 
-    //신규 게시글 생성
+    // 신규 게시글 생성
     @PostMapping("/post/save.do")
-    public String savePost(final PostRequest params) {
+    public String savePost(final PostRequest params, Model model) {
         postService.savePost(params);
-        return "redirect:/post/list.do";
-    };
+        MessageDto message = new MessageDto("게시글 생성이 완료되었습니다.", "/post/list.do", RequestMethod.GET, null);
+        return showMessageAndRedirect(message, model);
+    }
+
+
     // 게시글 리스트 페이지
     @GetMapping("/post/list.do")
-    public String openPostList(Model model) {
-        List<PostResponse> posts = postService.findAllPost();
-        model.addAttribute("posts", posts);
+    public String openPostList(@ModelAttribute("params") final SearchDto params, Model model) {
+        PagingResponse<PostResponse> response = postService.findAllPost(params);
+        model.addAttribute("response", response);
         return "post/list";
     }
 
@@ -48,15 +54,34 @@ public class PostController {
 
     // 기존 게시글 수정
     @PostMapping("/post/update.do")
-    public String updatePost(final PostRequest params) {
+    public String updatePost(final PostRequest params, Model model) {
         postService.updatePost(params);
-        return "redirect:/post/list.do";
+        MessageDto message = new MessageDto("게시글 수정이 완료되었습니다.", "/post/list.do", RequestMethod.GET, null);
+        return showMessageAndRedirect(message, model);
     }
 
     // 게시글 삭제
+    // 게시글 삭제
     @PostMapping("/post/delete.do")
-    public String deletePost(@RequestParam final Long id) {
+    public String deletePost(@RequestParam final Long id, final SearchDto queryParams, Model model) {
         postService.deletePost(id);
-        return "redirect:/post/list.do";
+        MessageDto message = new MessageDto("게시글 삭제가 완료되었습니다.", "/post/list.do", RequestMethod.GET, queryParamsToMap(queryParams));
+        return showMessageAndRedirect(message, model);
     }
-}
+
+    private String showMessageAndRedirect(final MessageDto params, Model model) {
+        model.addAttribute("params", params);
+        return "common/messageRedirect";
+    }
+
+    // 쿼리 스트링 파라미터를 Map에 담아 반환
+    private Map<String, Object> queryParamsToMap(final SearchDto queryParams) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("page", queryParams.getPage());
+        data.put("recordSize", queryParams.getRecordSize());
+        data.put("pageSize", queryParams.getPageSize());
+        data.put("keyword", queryParams.getKeyword());
+        data.put("searchType", queryParams.getSearchType());
+        return data;
+    }
+ }
