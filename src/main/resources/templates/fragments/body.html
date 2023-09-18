@@ -4,7 +4,7 @@
 <div id="adm_wrap">
     <header>
         <div class="head">
-            <h1>게시판 프로젝트</h1>
+            <a href="/post/list.do"><h1>게시판 프로젝트</h1></a>
             <div th:if="${session.loginMember != null}" class="top_menu">
                 <div class="login_user"><strong><i class="far fa-user-circle"></i> [[ ${session.loginMember.name} ]]</strong>님 반갑습니다.</div>
                 <div class="logout">

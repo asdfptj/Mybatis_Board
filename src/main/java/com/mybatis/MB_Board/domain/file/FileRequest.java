@@ -3,6 +3,9 @@ package com.mybatis.MB_Board.domain.file;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 public class FileRequest {
     private Long id;                // 파일 번호 (PK)
@@ -21,5 +24,7 @@ public class FileRequest {
     public void setPostId(Long postId) {
         this.postId = postId;
     }
+
+    private List<Long> removeFileIds = new ArrayList<>(); // 삭제할 첨부파일 id List
 
 }

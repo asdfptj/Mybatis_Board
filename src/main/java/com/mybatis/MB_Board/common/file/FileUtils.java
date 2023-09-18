@@ -1,13 +1,18 @@
-package com.mybatis.MB_Board.domain.file;
-
+package com.mybatis.MB_Board.common.file;
 
 import com.mybatis.MB_Board.domain.file.FileRequest;
+import com.mybatis.MB_Board.domain.file.FileResponse;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -104,6 +109,61 @@ public class FileUtils {
             dir.mkdirs();
         }
         return dir.getPath();
+    }
+
+    /**
+     * 파일 삭제 (from Disk)
+     * @param files - 삭제할 파일 정보 List
+     */
+    public void deleteFiles(final List<FileResponse> files) {
+        if (CollectionUtils.isEmpty(files)) {
+            return;
+        }
+        for (FileResponse file : files) {
+            String uploadedDate = file.getCreatedDate().toLocalDate().format(DateTimeFormatter.ofPattern("yyMMdd"));
+            deleteFile(uploadedDate, file.getSaveName());
+        }
+    }
+
+    /**
+     * 파일 삭제 (from Disk)
+     * @param addPath - 추가 경로
+     * @param filename - 파일명
+     */
+    private void deleteFile(final String addPath, final String filename) {
+        String filePath = Paths.get(uploadPath, addPath, filename).toString();
+        deleteFile(filePath);
+    }
+
+    /**
+     * 파일 삭제 (from Disk)
+     * @param filePath - 파일 경로
+     */
+    private void deleteFile(final String filePath) {
+        File file = new File(filePath);
+        if (file.exists()) {
+            file.delete();
+        }
+    }
+
+    /**
+     * 다운로드할 첨부파일(리소스) 조회 (as Resource)
+     * @param file - 첨부파일 상세정보
+     * @return 첨부파일(리소스)
+     */
+    public Resource readFileAsResource(final FileResponse file) {
+        String uploadedDate = file.getCreatedDate().toLocalDate().format(DateTimeFormatter.ofPattern("yyMMdd"));
+        String filename = file.getSaveName();
+        Path filePath = Paths.get(uploadPath, uploadedDate, filename);
+        try {
+            Resource resource = new UrlResource(filePath.toUri());
+            if (resource.exists() == false || resource.isFile() == false) {
+                throw new RuntimeException("file not found : " + filePath.toString());
+            }
+            return resource;
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("file not found : " + filePath.toString());
+        }
     }
 
 }
